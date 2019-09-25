@@ -41,8 +41,6 @@
 *.tif
 *.tiff
 
-# ilclient
-/libs
 
 # generated header
 help.h
