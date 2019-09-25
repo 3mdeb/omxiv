@@ -4,7 +4,7 @@ LDFLAGS+=-lilclient -ljpeg -lpng -lrt -ldl -Wl,--gc-sections -s
 INCLUDES+=-I./libnsbmp -I./libnsgif -I./libs/ilclient
 
 BUILDVERSION=\"$(shell git rev-parse --short=10 HEAD 2>/dev/null;test $$? -gt 0 && echo UNKNOWN)\"
-LIBCURL_NAME=\"$(shell ldconfig -p | grep libcurl | head -n 1 | awk '{print $$1;}' 2>/dev/null)\"
+LIBCURL_NAME=\"libcurl.so.4\"
 CFLAGS+=-DVERSION=${BUILDVERSION} -DLCURL_NAME=$(LIBCURL_NAME)
 
 include Makefile.include
