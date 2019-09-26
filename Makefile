@@ -22,7 +22,7 @@ help.h: README.md
 
 ilclient:
 	mkdir -p libs
-	cp -ru /opt/vc/src/hello_pi/libs/ilclient libs
+	cp -ru $(SYSROOT)/usr/src/hello_pi/libs/ilclient libs
 	make -C libs/ilclient
 	
 install:
