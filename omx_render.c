@@ -94,38 +94,58 @@ static int initResizer(OMX_RENDER *render, IMAGE *inImage){
 	if (ret != OMX_ErrorNone) {
 		return OMX_RENDER_ERROR_PARAMETER;
 	}
-	
+
 	portdef.format.image.eCompressionFormat = OMX_IMAGE_CodingUnused;
 	portdef.format.image.bFlagErrorConcealment = OMX_FALSE;
 	portdef.format.image.nFrameWidth = inImage->width;
 	portdef.format.image.nFrameHeight = inImage->height;
 	portdef.format.image.nStride = 0;
 	portdef.format.image.nSliceHeight = 0;
-	
-	
+
+
 	if(inImage->colorSpace == COLOR_SPACE_YUV420P)
 		portdef.format.image.eColorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
 	else if(inImage->colorSpace == COLOR_SPACE_RGBA)
 		portdef.format.image.eColorFormat = OMX_COLOR_Format32bitABGR8888;
 	else if(inImage->colorSpace == COLOR_SPACE_RGB16)
 		portdef.format.image.eColorFormat = OMX_COLOR_Format16bitRGB565;
-		
+
 	portdef.nBufferSize=inImage->nData;
-		
+
 
 	ret = OMX_SetParameter(render->resizeHandle, OMX_IndexParamPortDefinition, &portdef);
-	if (ret != OMX_ErrorNone) {	
+	if (ret != OMX_ErrorNone) {
 		return OMX_RENDER_ERROR_PARAMETER;
 	}
-	
+
+	OMX_CONFIG_RECTTYPE commonInputCrop;
+	commonInputCrop.nSize = sizeof(commonInputCrop);
+	commonInputCrop.nVersion.nVersion = OMX_VERSION;
+	commonInputCrop.nPortIndex = render->resizeInPort;
+
+	ret = OMX_GetParameter(render->resizeHandle, OMX_IndexConfigCommonInputCrop, &commonInputCrop);
+	if (ret != OMX_ErrorNone) {
+		return OMX_RENDER_ERROR_PARAMETER;
+	}
+
+	commonInputCrop.nWidth = 640;
+	commonInputCrop.nHeight = 480;
+	commonInputCrop.nLeft = 640;
+	commonInputCrop.nTop = 480;
+
+	ret = OMX_SetParameter(render->resizeHandle, OMX_IndexConfigCommonInputCrop, &commonInputCrop);
+	if (ret != OMX_ErrorNone) {
+		return OMX_RENDER_ERROR_PARAMETER;
+	}
+
 	ret = OMX_SendCommand(render->resizeHandle, OMX_CommandPortEnable, render->resizeInPort, NULL);
 	if(ret != OMX_ErrorNone){
 		return OMX_RENDER_ERROR_PORTS;
 	}
 
-	ret = OMX_UseBuffer(render->resizeHandle,&render->pInputBufferHeader,render->resizeInPort, 
+	ret = OMX_UseBuffer(render->resizeHandle,&render->pInputBufferHeader,render->resizeInPort,
 			NULL, portdef.nBufferSize, (OMX_U8 *) inImage->pData);
-			
+
 	if(ret != OMX_ErrorNone){
 		return OMX_RENDER_ERROR_MEMORY;
 	}
