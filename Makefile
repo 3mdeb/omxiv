@@ -10,5 +10,5 @@ ilclient:
 	cp -ru /opt/vc/src/hello_pi/libs/ilclient libs
 	make -C libs/ilclient
 
-libs:
+omxlibs:
 	make -C libs/omxlib
