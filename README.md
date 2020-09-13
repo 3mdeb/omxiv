@@ -1,6 +1,6 @@
 # OMX image viewer
 
-A GPU accelerated image viewer for the Raspberry Pi. 
+A GPU accelerated image viewer for the Raspberry Pi.
 
 ## Building
 
@@ -16,8 +16,8 @@ And install with:
 
 ## Synopsis
 
-USAGE: 
-    
+USAGE:
+
     omxiv [OPTIONS] image1 [image2] ...
     omxiv [OPTIONS] directory
 
@@ -59,16 +59,16 @@ KEY CONFIGURATION:
 * **JPEGs**
   - non-progressive: OMX.broadcom.image_decode
   - progressive: libjpeg
-  
+
 * **PNGs**
   - libpng
 
 * **BMPs**
   - libnsbmp
-  
+
 * **GIFs**
   - libnsgif
-  
+
 * **TIFFs**
   - libtiff
 
@@ -77,4 +77,3 @@ KEY CONFIGURATION:
   * Matt Ownby, Anthong Sale for their hello_jpeg example
   * Jan Newmarch for his [blog](http://jan.newmarch.name/RPi/index.html): Programming AudioVideo on the Raspberry Pi GPU
   * Various authors of example code and other parts (marked in the source files)
-
