@@ -127,7 +127,7 @@ static int initResizer(OMX_RENDER *render, IMAGE *inImage, int width_crop, int h
 	// if width_crop and height_crop are zeros we do not check other conditions for zooming
 	if (width_crop != 0 && height_crop != 0){
 		if (width_crop + left <= inImage->width && height_crop + top <= inImage->height){
-			fprintf(stderr, "displaying image with ZOOM\n");
+			printf("displaying image with ZOOM\n");
 			ret = OMX_GetParameter(render->resizeHandle, OMX_IndexConfigCommonInputCrop, &commonInputCrop);
 			if (ret != OMX_ErrorNone) {
 					return OMX_RENDER_ERROR_PARAMETER;
@@ -143,7 +143,7 @@ static int initResizer(OMX_RENDER *render, IMAGE *inImage, int width_crop, int h
 					return OMX_RENDER_ERROR_PARAMETER;
 			}
 		}else{
-			fprintf(stderr, "WARNING: ZOOM conditions were not met... image will be displayed normally\n");
+			printf("WARNING: ZOOM conditions were not met... image will be displayed normally\n");
 		}
 	}
 

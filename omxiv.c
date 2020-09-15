@@ -23,8 +23,8 @@
 static const char magNumJpeg[] = {0xff, 0xd8, 0xff};
 
 //to change
-static const int zoomLeft = 1;
-static const int zoomTop = 1;
+//static const int zoomLeft = 1;
+//static const int zoomTop = 1;
 
 static const struct option longOpts[] = {
 	{"help", no_argument, 0, 'h'},
@@ -149,7 +149,7 @@ static char getch(const int timeout) {
 	return (buf);
 }
 
-static int renderImage(IMAGE *image, ANIM_IMAGE *anim, int width, int height){
+static int renderImage(IMAGE *image, ANIM_IMAGE *anim, int width, int height, int zoomLeft, int zoomTop){
 	int ret;
 	OMX_RENDER *stopRender = NULL;
 	
@@ -347,11 +347,14 @@ int main(int argc, char *argv[]){
 	render.transition.type = NONE;
 	render.transition.durationMs = 400;
 
+	int zoomLeft = 1;
+	int zoomTop = 1;
+
 	if(isBackgroundProc())
 		keys=0;
 	
 	int opt;
-	while((opt = getopt_long(argc, argv, "vt:bT:a:o:ml:d:iks", 
+	while((opt = getopt_long(argc, argv, "vt:bT:a:o:ml:d:iksP:O:", 
 			longOpts, NULL)) != -1){
 		
 		switch(opt){
@@ -408,6 +411,12 @@ int main(int argc, char *argv[]){
 				keys = 0; break;
 			case 's':
 				soft = 1; break;
+			case 'P':
+				zoomLeft = strtol(optarg, NULL, 10);
+				break;
+			case 'O':
+				zoomTop = strtol(optarg, NULL, 10);
+				break;
 			case 0x103:
 				exifOrient = 0; break;
 			default:
@@ -474,7 +483,7 @@ int main(int argc, char *argv[]){
 		if(blank)
 			blankBackground(dispConfig.layer, dispConfig.display);
 		lShowTime = getCurrentTimeMs();
-		if(renderImage(&image, &anim, sWidth, sHeight) != 0)
+		if(renderImage(&image, &anim, sWidth, sHeight, zoomLeft, zoomTop) != 0)
 			end = 1;
 	}else{
 		if(ret == SOFT_IMAGE_ERROR_FILE_OPEN){
@@ -506,7 +515,7 @@ int main(int argc, char *argv[]){
 				ret=decodeImage(files[i], &image, &anim);
 				if(ret==0){
 					lShowTime = getCurrentTimeMs();
-					if(renderImage(&image, &anim, sWidth, sHeight) != 0)
+					if(renderImage(&image, &anim, sWidth, sHeight, zoomLeft, zoomTop) != 0)
 						break;
 				}
 			}
@@ -551,7 +560,7 @@ int main(int argc, char *argv[]){
 				ret=decodeImage(files[i], &image, &anim);
 				if(ret==0){
 					lShowTime = getCurrentTimeMs();
-					if(renderImage(&image, &anim, sWidth, sHeight) != 0)
+					if(renderImage(&image, &anim, sWidth, sHeight, zoomLeft, zoomTop) != 0)
 						break;
 				}
 			}else if(c == 0x44 && imageNum > 1){
@@ -560,7 +569,7 @@ int main(int argc, char *argv[]){
 				ret=decodeImage(files[i], &image, &anim);
 				if(ret==0){
 					lShowTime = getCurrentTimeMs();
-					if(renderImage(&image, &anim, sWidth, sHeight) != 0)
+					if(renderImage(&image, &anim, sWidth, sHeight, zoomLeft, zoomTop) != 0)
 						break;
 				}
 			}
