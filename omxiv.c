@@ -565,8 +565,10 @@ int main(int argc, char *argv[]){
 					break;
 			}			
 		} else if (c == '-'){
-			zoomTop -= dZoomTop;
-			zoomLeft -= dZoomLeft;
+			if (zoomTop - dZoomTop > 0 && zoomLeft - dZoomLeft > 0){
+				zoomTop -= dZoomTop;
+				zoomLeft -= dZoomLeft;
+			}
 			ret=decodeImage(files[i], &image, &anim);
 			if(ret==0){
 				lShowTime = getCurrentTimeMs();
