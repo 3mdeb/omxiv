@@ -227,7 +227,6 @@ static int decodeImage(const char *filePath, IMAGE *image, ANIM_IMAGE *anim){
 	int ret = 0;
 	FILE *imageFile;
 	unsigned char *httpImMem = NULL;
-	size_t size = 0;
 	char magNum[8];
 	
 	exifOrient = (exifOrient == 0) ? 0 : 1;
