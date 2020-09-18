@@ -27,7 +27,6 @@ static const char magNumJpeg[] = {0xff, 0xd8, 0xff};
 //static const int zoomTop = 1;
 
 static const struct option longOpts[] = {
-	{"help", no_argument, 0, 'h'},
 	{"version", no_argument, 0, 'v'},
 	{"blank", no_argument, 0, 'b'},
 	{"transition", required_argument, 0, 'T'},
@@ -344,11 +343,13 @@ int main(int argc, char *argv[]){
 	int ret = 1;
 	long timeout = 0;
 
-	render.transition.type = NONE;
+	render.transition.type = BLEND;
 	render.transition.durationMs = 400;
 
-	int zoomLeft = 1;
-	int zoomTop = 1;
+	int zoomLeft = 0;
+	int zoomTop = 0;
+	int dZoomLeft = 10;
+	int dZoomTop = 10;
 
 	if(isBackgroundProc())
 		keys=0;
@@ -367,8 +368,8 @@ int main(int argc, char *argv[]){
 			case 'b':
 				blank = 1; break;
 			case 'T':
-				if(strcmp(optarg, "blend") == 0)
-					render.transition.type = BLEND;
+				if(strcmp(optarg, "none") == 0)
+					render.transition.type = NONE;
 				break;
 			case 0x101:
 				render.transition.durationMs = strtol(optarg, NULL, 10);
@@ -413,9 +414,19 @@ int main(int argc, char *argv[]){
 				soft = 1; break;
 			case 'P':
 				zoomLeft = strtol(optarg, NULL, 10);
+				if (zoomLeft % 2 != 0){
+					zoomLeft += 1;
+				}
+				if (info)
+					printf("zoomLeft: %d\n", zoomLeft);
 				break;
 			case 'O':
 				zoomTop = strtol(optarg, NULL, 10);
+				if (zoomTop % 2 != 0){
+					zoomTop += 1;
+				}
+				if (info)
+					printf("zoomTop: %d\n",zoomTop);
 				break;
 			case 0x103:
 				exifOrient = 0; break;
@@ -463,9 +474,11 @@ int main(int argc, char *argv[]){
 			graphics_get_display_size(dispConfig.display, &sWidth, &sHeight);
 			dispConfig.width = sWidth;
 			dispConfig.height = sHeight;
+			printf("dispConfig.width: %d\ndispConfig.height: %d\n", dispConfig.width, dispConfig.height);
 		}else{
 			sWidth = dispConfig.width;
 			sHeight = dispConfig.height;
+			printf("sWidth: %d\nsHeight: %d\n", sHeight,sWidth);
 		}
 	}
 
@@ -480,10 +493,19 @@ int main(int argc, char *argv[]){
 	ret=decodeImage(files[0], &image, &anim);
 
 	if(ret==0){
+		dZoomLeft = (int) image.width / 10;
+		if (dZoomLeft % 2 != 0)
+			dZoomLeft += 1;
+		dZoomTop = (int) image.height / 10;
+		if (dZoomTop % 2 != 0)
+			dZoomTop += 1;
+		
+		if (info)
+			printf("dZoomLeft: %d\ndZoomTop: %d\n", dZoomLeft, dZoomTop);
 		if(blank)
 			blankBackground(dispConfig.layer, dispConfig.display);
 		lShowTime = getCurrentTimeMs();
-		if(renderImage(&image, &anim, sWidth, sHeight, zoomLeft, zoomTop) != 0)
+		if(renderImage(&image, &anim, image.width - zoomLeft *2, image.height - zoomTop *2 , zoomLeft, zoomTop) != 0)
 			end = 1;
 	}else{
 		if(ret == SOFT_IMAGE_ERROR_FILE_OPEN){
@@ -515,7 +537,7 @@ int main(int argc, char *argv[]){
 				ret=decodeImage(files[i], &image, &anim);
 				if(ret==0){
 					lShowTime = getCurrentTimeMs();
-					if(renderImage(&image, &anim, sWidth, sHeight, zoomLeft, zoomTop) != 0)
+					if(renderImage(&image, &anim, image.width - zoomLeft *2, image.height - zoomTop *2 , zoomLeft, zoomTop) != 0)
 						break;
 				}
 			}
@@ -534,6 +556,24 @@ int main(int argc, char *argv[]){
 				fprintf(stderr, "dispConfig set returned 0x%x\n", ret);
 				break;
 			}
+		} else if (c == '+'){
+			zoomTop += dZoomTop;
+			zoomLeft += dZoomLeft;
+			ret=decodeImage(files[i], &image, &anim);
+			if(ret==0){
+				lShowTime = getCurrentTimeMs();
+				if(renderImage(&image, &anim, image.width - zoomLeft *2, image.height - zoomTop *2 , zoomLeft, zoomTop) != 0)
+					break;
+			}			
+		} else if (c == '-'){
+			zoomTop -= dZoomTop;
+			zoomLeft -= dZoomLeft;
+			ret=decodeImage(files[i], &image, &anim);
+			if(ret==0){
+				lShowTime = getCurrentTimeMs();
+				if(renderImage(&image, &anim, image.width - zoomLeft *2, image.height - zoomTop *2 , zoomLeft, zoomTop) != 0)
+					break;
+			}	
 		}else if(c == 0x1b){
 			c=getch(1);
 			if(c == 0)
@@ -560,7 +600,7 @@ int main(int argc, char *argv[]){
 				ret=decodeImage(files[i], &image, &anim);
 				if(ret==0){
 					lShowTime = getCurrentTimeMs();
-					if(renderImage(&image, &anim, sWidth, sHeight, zoomLeft, zoomTop) != 0)
+					if(renderImage(&image, &anim, image.width - zoomLeft *2, image.height - zoomTop *2 , zoomLeft, zoomTop) != 0)
 						break;
 				}
 			}else if(c == 0x44 && imageNum > 1){
@@ -569,7 +609,7 @@ int main(int argc, char *argv[]){
 				ret=decodeImage(files[i], &image, &anim);
 				if(ret==0){
 					lShowTime = getCurrentTimeMs();
-					if(renderImage(&image, &anim, sWidth, sHeight, zoomLeft, zoomTop) != 0)
+					if(renderImage(&image, &anim, image.width - zoomLeft *2, image.height - zoomTop *2 , zoomLeft, zoomTop) != 0)
 						break;
 				}
 			}
